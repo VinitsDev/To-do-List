@@ -1,6 +1,9 @@
 package br.com.projects.To_do_List.service;
 
+import br.com.projects.To_do_List.dtos.TaskRequest;
+import br.com.projects.To_do_List.dtos.TaskResponse;
 import br.com.projects.To_do_List.entities.Task;
+import br.com.projects.To_do_List.mappers.TaskMapper;
 import br.com.projects.To_do_List.repository.TaskRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -10,29 +13,40 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
 public class TaskService {
 
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
 
+    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper) {
+        this.taskRepository = taskRepository;
+        this.taskMapper = taskMapper;
+    }
 
-    public List<Task> create(Task task){
+    public TaskResponse create(TaskRequest request){
+        Task task = taskMapper.toTask(request);
         taskRepository.save(task);
-        return listALL();
+        return taskMapper.toResponse(task);
     }
 
-    public List<Task> update(Task task){
+    public TaskResponse update(Task task){
         taskRepository.save(task);
-        return listALL();
+        return taskMapper.toResponse(task);
     }
 
-    public List<Task> listALL(){
-        return taskRepository.findAll(Sort.by("priority").descending().and(Sort.by("name").ascending()));
+    public List<TaskResponse> listAll(){
+        List<Task> tasks = taskRepository.findAll(Sort.by("deadline").ascending());
+        return tasks.stream().map(taskMapper::toResponse).toList();
     }
 
-    public List<Task> delete(Long id){
+    public TaskResponse find(Long id){
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task não encontrada"));
+        return taskMapper.toResponse(task);
+    }
+
+    public void delete(Long id){
         taskRepository.deleteById(id);
-        return listALL();
     }
 
 
