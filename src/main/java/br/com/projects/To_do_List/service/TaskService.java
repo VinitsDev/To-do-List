@@ -5,7 +5,6 @@ import br.com.projects.To_do_List.dtos.TaskResponse;
 import br.com.projects.To_do_List.entities.Task;
 import br.com.projects.To_do_List.mappers.TaskMapper;
 import br.com.projects.To_do_List.repository.TaskRepository;
-import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +28,14 @@ public class TaskService {
         return taskMapper.toResponse(task);
     }
 
-    public TaskResponse update(Task task){
+    public TaskResponse update(long id, TaskRequest request){
+        Task task = taskRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Task não encontrada"));
+
+        task.setName(request.name());
+        task.setDescription(request.description());
+        task.setDeadline(request.deadline());
+
         taskRepository.save(task);
         return taskMapper.toResponse(task);
     }

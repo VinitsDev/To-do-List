@@ -3,13 +3,9 @@ package br.com.projects.To_do_List.controllers;
 
 import br.com.projects.To_do_List.dtos.TaskRequest;
 import br.com.projects.To_do_List.dtos.TaskResponse;
-import br.com.projects.To_do_List.entities.Task;
-import br.com.projects.To_do_List.mappers.TaskMapper;
 import br.com.projects.To_do_List.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -35,10 +31,10 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping
+    @PutMapping("{id}")
     @Operation(description = "Updates a task")
-    public ResponseEntity<TaskResponse> update(@RequestBody @Valid Task task){
-        TaskResponse response = taskService.update(task);
+    public ResponseEntity<TaskResponse> update(@RequestBody @Valid TaskRequest request,@PathVariable("id") Long id){
+        TaskResponse response = taskService.update(id, request);
         return ResponseEntity.ok(response);
     }
 
